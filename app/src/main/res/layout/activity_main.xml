@@ -90,7 +90,7 @@
 
     <Switch
         android:id="@+id/DataCollectionSwitch"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:layout_gravity="center"
@@ -103,7 +103,7 @@
 
     <Switch
         android:id="@+id/AutoCheckUploadSwitch"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:layout_gravity="center"

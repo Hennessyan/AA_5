@@ -229,19 +229,19 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
                 Log.e("I am in handler","lalala");
                 if(message.arg1 == 1){
                     stopService();
-//                    breakService();
+                    breakService();
                     editor.putBoolean("DCS_status", false);
                     editor.commit();
-//                    editor.putBoolean("ACU_status", false);
-//                    editor.commit();
+                    editor.putBoolean("ACU_status", false);
+                    editor.commit();
                 }
                 else if(message.arg1 == 2){
                     startService();
-//                    uploadService();
+                    uploadService();
                     editor.putBoolean("DCS_status", true);
                     editor.commit();
-//                    editor.putBoolean("ACU_status", true);
-//                    editor.commit();
+                    editor.putBoolean("ACU_status", true);
+                    editor.commit();
                 }
 
             }
