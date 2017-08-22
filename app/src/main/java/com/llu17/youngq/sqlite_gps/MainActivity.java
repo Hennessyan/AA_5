@@ -307,6 +307,7 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
                 editor.commit();
             }
             else {
+
                 manualInputPart.setVisibility(android.view.View.GONE);
                 editor.putBoolean("manualInput_status", false);
                 editor.commit();
@@ -435,6 +436,18 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
     public void breakServicePL(){
         Toast.makeText(this, "Stop to upload parking info manually", Toast.LENGTH_SHORT).show();
         stopService(new Intent(getBaseContext(), UploadServicePL.class));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     private static String getSerialNumber(){
