@@ -13,6 +13,7 @@ import com.llu17.youngq.sqlite_gps.table.GPS;
 import com.llu17.youngq.sqlite_gps.table.GYROSCOPE;
 import com.llu17.youngq.sqlite_gps.table.MAGNETOMETER;
 import com.llu17.youngq.sqlite_gps.table.MOTIONSTATE;
+import com.llu17.youngq.sqlite_gps.table.PARKINGSTATE;
 import com.llu17.youngq.sqlite_gps.table.STEP;
 import com.llu17.youngq.sqlite_gps.table.WIFI;
 
@@ -42,9 +43,9 @@ import static com.llu17.youngq.sqlite_gps.UploadService.wifistate;
 
 public class VariableManager {
 
-    private SQLiteDatabase db1, db2, db3, db4, db5, db6, db7, db8;
-    private JSONObject acce_object,gyro_object,gps_object,motion_object,step_object,battery_object,wifi_object,magne_object;
-    private JSONArray AcceJsonArray,GyroJsonArray,GpsJsonArray,MotionJsonArray,StepJsonArray,BatteryJsonArray,WiFiJsonArray,MagneJsonArray;
+    private SQLiteDatabase db1, db2, db3, db4, db5, db6, db7, db8, db9;
+    private JSONObject acce_object,gyro_object,gps_object,motion_object,step_object,battery_object,wifi_object,magne_object,park_object;
+    private JSONArray AcceJsonArray,GyroJsonArray,GpsJsonArray,MotionJsonArray,StepJsonArray,BatteryJsonArray,WiFiJsonArray,MagneJsonArray,ParkJsonArray;
     private int sizeOfUpload = 100;
 
     public static ArrayList<GPS> gpses;
@@ -55,6 +56,7 @@ public class VariableManager {
     public static ArrayList<BATTERY> batteries;
     public static ArrayList<WIFI> wifis;
     public static ArrayList<MAGNETOMETER> magnetometers;
+    public static ArrayList<PARKINGSTATE> parkinglots;
 
     private static CountDownLatch latch = null;
 
@@ -70,7 +72,7 @@ public class VariableManager {
     public void unregisterListener (Listener listener) {
         mListener = null;
     }
-    private boolean[] myBoolean = new boolean[8];
+    private boolean[] myBoolean = new boolean[9];
     public void doYourWork() {
         Log.e("There is WiFi","I am here!");
         final String gps_url = "http://cs.binghamton.edu/~smartpark/lulu_test/gps.php";
@@ -81,12 +83,13 @@ public class VariableManager {
         final String wifi_url = "http://cs.binghamton.edu/~smartpark/lulu_test/wifi.php";
         final String battery_url = "http://cs.binghamton.edu/~smartpark/lulu_test/battery.php";
         final String magne_url = "http://cs.binghamton.edu/~smartpark/lulu_test/magnetometer.php";
-        final int[] result = new int[8];
+        final String park_url = "http://cs.binghamton.edu/~smartpark/lulu_test/parkingstate.php";
+        final int[] result = new int[9];
 
         boolean label = true;
 
         while(label) {
-            for(int i = 0; i < 8; i++) {
+            for(int i = 0; i < 9; i++) {
                 myBoolean[i] = false;
                 result[i] = 0;
             }
@@ -100,8 +103,9 @@ public class VariableManager {
                 batteries = find_all_battery();
                 wifis = find_all_wifi();
                 magnetometers = find_all_magne();
+                parkinglots = find_all_park();
 
-                latch = new CountDownLatch(8);
+                latch = new CountDownLatch(9);
                 Thread t1 = new Thread() {
                     public void run() {
                         if(gpses != null)
@@ -166,6 +170,14 @@ public class VariableManager {
                     }
                 };
                 t8.start();
+                Thread t9 = new Thread() {
+                    public void run() {
+                        if(parkinglots != null)
+                            result[8] = post_data(park_url, changeParkingDateToJson());
+                        latch.countDown();
+                    }
+                };
+                t9.start();
 
                 try {
                     latch.await();
@@ -181,7 +193,7 @@ public class VariableManager {
 //                Log.e("result[5]","!!!!!"+result[5]);
 //                Log.e("result[6]","!!!!!"+result[6]);
 //                Log.e("result[7]","!!!!!"+result[7]);
-                for(int i = 0; i < 8; i++) {
+                for(int i = 0; i < 9; i++) {
                     if (result[i] == 200)
                         myBoolean[i] = true;
                     else
@@ -475,6 +487,37 @@ public class VariableManager {
         Log.e("i am here3", "hello88888888");
         return null;
     }
+    private ArrayList<PARKINGSTATE> find_all_park(){
+//        dbHelper = new GpsDbHelper(this);
+        db9 = dbHelper1.getReadableDatabase();
+        Cursor c = null;
+        String s = "select Id, timestamp, state from parkingstate where Tag = 0 limit 200;";
+        try {
+            c = db9.rawQuery(s, null);
+            if (c != null && c.getCount() > 0) {
+                ArrayList<PARKINGSTATE> parklist = new ArrayList<>();
+                PARKINGSTATE park;
+                while (c.moveToNext()) {
+                    park = new PARKINGSTATE();
+                    park.setId(c.getString(c.getColumnIndexOrThrow(GpsContract.ParkingStateEntry.COLUMN_ID)));
+                    park.setTimestamp(c.getLong(c.getColumnIndexOrThrow(GpsContract.ParkingStateEntry.COLUMN_TIMESTAMP)));
+                    park.setState(c.getInt(c.getColumnIndexOrThrow(GpsContract.ParkingStateEntry.COLUMN_STATE)));
+                    parklist.add(park);
+                }
+                return parklist;
+            } else {
+                Log.e("i am here", "hello99999999");
+            }
+        }
+        catch(Exception e){
+            Log.e("exception: ", e.getMessage());
+        }
+        finally {
+            c.close();
+            db9.close();
+        }
+        return null;
+    }
 
     private JSONArray changeGpsDateToJson() {
         if(gpses.size() == sizeOfUpload) {
@@ -645,6 +688,22 @@ public class VariableManager {
         }
         else
             return null;
+    }
+    private JSONArray changeParkingDateToJson() {
+        ParkJsonArray=null;
+        ParkJsonArray = new JSONArray();
+        for (int i = 0; i < parkinglots.size(); i++) {
+            park_object = new JSONObject();
+            try {
+                park_object.put("UserID", parkinglots.get(i).getId());
+                park_object.put("Timestamp", parkinglots.get(i).getTimestamp());
+                park_object.put("State", parkinglots.get(i).getState());
+                ParkJsonArray.put(park_object);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return ParkJsonArray;
     }
 
     private int post_data(String url, JSONArray json){

@@ -31,6 +31,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,8 +61,7 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
     private SharedPreferences.Editor editor;
     private SharedPreferences prefs;
     public static Handler mHandler;
-    private boolean flagOfSharedPreferences = false;    //unregister
-
+    private LinearLayout manualInputPart;
     //used to save parking lots info
     private GpsDbHelper dbHelper_pl;
     private SQLiteDatabase mDb_pl;
@@ -86,40 +86,41 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
 
         });
 
-        DataCollectionSwitch = (Switch) findViewById(R.id.DataCollectionSwitch);
-        AutoCheckUploadSwitch = (Switch) findViewById(R.id.AutoCheckUploadSwitch);
-//        ManuCheckUploadSwitch = (Switch) findViewById(R.id.ManuCheckUploadSwitch);
-        AutoControlSwitch = (Switch) findViewById(R.id.AutoControlSwitch);
-        ParkInfoSwitch = (Switch) findViewById(R.id.ParkInfoUploadSwitch);
-
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-//        sampling_rate = sharedPreferences.getString(getResources().getString(R.string.sr_key_all),"1000");
-//        sleepMode = sharedPreferences.getBoolean("checkboxPref_SM",false);
-//        manualInput = sharedPreferences.getBoolean("checkboxPref_MI",false);
-//        Log.e("-----ALL SR-----",""+sampling_rate);
-//        Log.e("-----SM SR1-----",""+sleepMode);
-//        Log.e("-----MI SR1-----",""+manualInput);
-
         /*used to keep the status recorded, otherwise everytime reopen the app, switch will be off*/
         editor = getSharedPreferences("com.llu17.youngq.sqlite_gps", MODE_PRIVATE).edit();
         prefs = getSharedPreferences("com.llu17.youngq.sqlite_gps", MODE_PRIVATE);
 
-        flagOfSharedPreferences = prefs.getBoolean("SharedPreferencesStatus",false);
-        if(!flagOfSharedPreferences) {
-            sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-            editor.putBoolean("SharedPreferencesStatus", true);
-            editor.commit();
-        }
+        Log.e("lalalala","i am here!!!");
+        manualInputPart = (LinearLayout) findViewById(R.id.Manual_Part);
+        if(!prefs.getBoolean("manualInput_status",false))
+            manualInputPart.setVisibility(android.view.View.GONE);
+        else
+            manualInputPart.setVisibility(View.VISIBLE);
+
+        DataCollectionSwitch = (Switch) findViewById(R.id.DataCollectionSwitch);
+        AutoCheckUploadSwitch = (Switch) findViewById(R.id.AutoCheckUploadSwitch);
+//        ManuCheckUploadSwitch = (Switch) findViewById(R.id.ManuCheckUploadSwitch);
+//        AutoControlSwitch = (Switch) findViewById(R.id.AutoControlSwitch);
+//        ParkInfoSwitch = (Switch) findViewById(R.id.ParkInfoUploadSwitch);
+
+
+        //不能只使用一次监听注册,否则当重新进入main activity的时候,settings中值的改变不会影响main activity的布局
+        //因此对应的layout改变不是当前main activity的了(对应的是第一次的)
+//        flagOfSharedPreferences = prefs.getBoolean("SharedPreferencesStatus",false);
+//        if(!flagOfSharedPreferences) {
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+//            editor.putBoolean("SharedPreferencesStatus", true);
+//            editor.commit();
+//        }
 
 
 
         DataCollectionSwitch.setChecked(prefs.getBoolean("DCS_status",false));
         AutoCheckUploadSwitch.setChecked(prefs.getBoolean("ACU_status",false));
 //        ManuCheckUploadSwitch.setChecked(prefs.getBoolean("MCU_status",false));
-        AutoControlSwitch.setChecked(prefs.getBoolean("ACS_status",false));
-        ParkInfoSwitch.setChecked(prefs.getBoolean("PIS_status",false));
-        //////////
+//        AutoControlSwitch.setChecked(prefs.getBoolean("ACS_status",false));
+//        ParkInfoSwitch.setChecked(prefs.getBoolean("PIS_status",false));
         /*===check sqlite data using "chrome://inspect"===*/
         Stetho.initializeWithDefaults(this);
         new OkHttpClient.Builder()
@@ -128,8 +129,8 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
         //////////
         upload_state = (TextView)findViewById(R.id.Upload_State);
         upload_state.setVisibility(android.view.View.GONE);
-        upload_state_pl = (TextView)findViewById(R.id.PL_Upload_State);
-        upload_state_pl.setVisibility(android.view.View.GONE);
+//        upload_state_pl = (TextView)findViewById(R.id.PL_Upload_State);
+//        upload_state_pl.setVisibility(android.view.View.GONE);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
@@ -210,32 +211,32 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
 //                }
 //            }
 //        });
-        AutoControlSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
-                Log.e("AutoControlSwitch","i am here !");
-                editor.putBoolean("ACS_status", bChecked);
-                editor.commit();
-                if (bChecked) {
-                    startAutoControl();
-                } else {
-                    breakAutoControl();
-                }
-            }
-        });
-        ParkInfoSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
-                Log.e("ParkInfoSwitch","i am here !");
-                editor.putBoolean("PIS_status", bChecked);
-                editor.commit();
-                if (bChecked) {
-                    uploadServicePL();
-                } else {
-                    breakServicePL();
-                }
-            }
-        });
+//        AutoControlSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
+//                Log.e("AutoControlSwitch","i am here !");
+//                editor.putBoolean("ACS_status", bChecked);
+//                editor.commit();
+//                if (bChecked) {
+//                    startAutoControl();
+//                } else {
+//                    breakAutoControl();
+//                }
+//            }
+//        });
+//        ParkInfoSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
+//                Log.e("ParkInfoSwitch","i am here !");
+//                editor.putBoolean("PIS_status", bChecked);
+//                editor.commit();
+//                if (bChecked) {
+//                    uploadServicePL();
+//                } else {
+//                    breakServicePL();
+//                }
+//            }
+//        });
 
         mHandler = new Handler(Looper.getMainLooper()) {
             @Override
@@ -290,12 +291,26 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
             Log.e("-----ALL SR2-----","changed: "+sampling_rate);
         } else if (key.equals("checkboxPref_SM")){
             sleepMode = sharedPreferences.getBoolean(key, false);
-            Log.e("-----SM SR2-----",""+sleepMode);
-//            Log.e("-----~~~~~~-----","~~~~~~~");
+            if(sleepMode) {
+                Log.e("-----Sleep Mode-----", "turn on");
+                startAutoControl();
+            }
+            else {
+                Log.e("-----Sleep Mode-----", "turn off");
+                breakAutoControl();
+            }
         } else if (key.equals("checkboxPref_MI")){
             manualInput = sharedPreferences.getBoolean(key, false);
-            Log.e("-----MI SR2-----",""+manualInput);
-//            Log.e("********","~~~~~~~");
+            if(manualInput) {
+                manualInputPart.setVisibility(View.VISIBLE);
+                editor.putBoolean("manualInput_status", true);
+                editor.commit();
+            }
+            else {
+                manualInputPart.setVisibility(android.view.View.GONE);
+                editor.putBoolean("manualInput_status", false);
+                editor.commit();
+            }
         }
     }
     public void startService() {        //startService(View view) 如果使用button.click去控制就要使用:startService(View v)

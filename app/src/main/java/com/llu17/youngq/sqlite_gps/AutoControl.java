@@ -33,6 +33,7 @@ public class AutoControl extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         acquireWakeLock();
 
+        Log.e("AutoControl: ","start");
         timer = new Timer();
         timer.schedule(new AutoMonitor(), 0, 1000);
 

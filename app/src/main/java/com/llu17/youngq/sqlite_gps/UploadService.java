@@ -51,6 +51,7 @@ import static com.llu17.youngq.sqlite_gps.VariableManager.gpses;
 import static com.llu17.youngq.sqlite_gps.VariableManager.gyros;
 import static com.llu17.youngq.sqlite_gps.VariableManager.magnetometers;
 import static com.llu17.youngq.sqlite_gps.VariableManager.motions;
+import static com.llu17.youngq.sqlite_gps.VariableManager.parkinglots;
 import static com.llu17.youngq.sqlite_gps.VariableManager.steps;
 import static com.llu17.youngq.sqlite_gps.VariableManager.wifis;
 
@@ -395,6 +396,40 @@ public class UploadService extends Service implements VariableManager.Listener{
                         if (db1 != null) {
                             //db1.execSQL("update accelerometer set Tag = 1 where timestamp between ? and ?", new Object[]{acces.get(0).getTimestamp(), acces.get(acces.size() - 1).getTimestamp()});
                             db1.execSQL("delete from magnetometer where timestamp between ? and ?", new Object[]{magnetometers.get(0).getTimestamp(), magnetometers.get(magnetometers.size() - 1).getTimestamp()});
+                        } else {
+                            Log.e("db1~~~~~~", "null");
+                        }
+                    }
+                    catch(Exception e){
+                        Log.e("here~~~~~~~~~~~~~~", "stop upload");
+                        Log.e("exception: ", e.getMessage());
+                    }
+                    finally {
+                        db1.close();
+                    }
+                    latch.countDown();
+                }
+            };
+            t1.start();
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Log.e("lalala", "********");
+        } else {
+            Log.e("hahahahahahahahahahahha","2222222222");
+        }
+        if (state[8]) {
+            latch = new CountDownLatch(1);
+            Thread t1 = new Thread() {
+                public void run() {
+                    db1 = dbHelper.getWritableDatabase();
+                    try {
+                        if (db1 != null) {
+                            //db1.execSQL("update accelerometer set Tag = 1 where timestamp between ? and ?", new Object[]{acces.get(0).getTimestamp(), acces.get(acces.size() - 1).getTimestamp()});
+                            db1.execSQL("delete from parkingstate where timestamp between ? and ?", new Object[]{parkinglots.get(0).getTimestamp(), parkinglots.get(parkinglots.size() - 1).getTimestamp()});
+
                         } else {
                             Log.e("db1~~~~~~", "null");
                         }

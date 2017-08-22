@@ -261,7 +261,7 @@ public class UploadServicePL extends Service {
                             label = false;
                         }
                     }
-                    upload_state_pl.setVisibility(android.view.View.VISIBLE);
+//                    upload_state_pl.setVisibility(android.view.View.VISIBLE);
                     unregisterReceiver(mConnReceiver);
                 } else {
                     wifistate[0] = 0;

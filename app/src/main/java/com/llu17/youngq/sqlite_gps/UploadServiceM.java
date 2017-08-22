@@ -25,6 +25,7 @@ import com.llu17.youngq.sqlite_gps.table.GPS;
 import com.llu17.youngq.sqlite_gps.table.GYROSCOPE;
 import com.llu17.youngq.sqlite_gps.table.MAGNETOMETER;
 import com.llu17.youngq.sqlite_gps.table.MOTIONSTATE;
+import com.llu17.youngq.sqlite_gps.table.PARKINGSTATE;
 import com.llu17.youngq.sqlite_gps.table.STEP;
 import com.llu17.youngq.sqlite_gps.table.WIFI;
 
@@ -74,7 +75,7 @@ public class UploadServiceM extends Service{
     private String wifi_url = "http://cs.binghamton.edu/~smartpark/lulu_test/wifi.php";
     private String battery_url = "http://cs.binghamton.edu/~smartpark/lulu_test/battery.php";
     private String magne_url = "http://cs.binghamton.edu/~smartpark/lulu_test/magnetometer.php";
-
+    private String park_url = "http://cs.binghamton.edu/~smartpark/lulu_test/parkingstate.php";
 
     private ArrayList<GPS> gpses;
     private ArrayList<ACCELEROMETER> acces;
@@ -84,11 +85,12 @@ public class UploadServiceM extends Service{
     private ArrayList<BATTERY> batteries;
     private ArrayList<WIFI> wifis;
     private ArrayList<MAGNETOMETER> magnetometers;
-
+    private ArrayList<PARKINGSTATE> parkinglots;
 
     private JSONObject acce_object,gyro_object,gps_object,motion_object,step_object,battery_object,wifi_object,magne_object;
     private JSONArray AcceJsonArray,GyroJsonArray,GpsJsonArray,MotionJsonArray,StepJsonArray,BatteryJsonArray,WiFiJsonArray,MagneJsonArray;
-
+    private JSONObject park_object;
+    private JSONArray ParkJsonArray;
 
     @Nullable
     @Override
@@ -386,7 +388,37 @@ public class UploadServiceM extends Service{
         Log.e("i am here3", "hello77777777");
         return null;
     }
-
+    private ArrayList<PARKINGSTATE> find_all_park(){
+        dbHelper = new GpsDbHelper(this);
+        db = dbHelper.getReadableDatabase();
+        Cursor c = null;
+        String s = "select Id, timestamp, state from parkingstate where Tag = 0 limit 200;";
+        try {
+            c = db.rawQuery(s, null);
+            if (c != null && c.getCount() > 0) {
+                ArrayList<PARKINGSTATE> parklist = new ArrayList<>();
+                PARKINGSTATE park;
+                while (c.moveToNext()) {
+                    park = new PARKINGSTATE();
+                    park.setId(c.getString(c.getColumnIndexOrThrow(GpsContract.ParkingStateEntry.COLUMN_ID)));
+                    park.setTimestamp(c.getLong(c.getColumnIndexOrThrow(GpsContract.ParkingStateEntry.COLUMN_TIMESTAMP)));
+                    park.setState(c.getInt(c.getColumnIndexOrThrow(GpsContract.ParkingStateEntry.COLUMN_STATE)));
+                    parklist.add(park);
+                }
+                return parklist;
+            } else {
+                Log.e("i am here", "hello44444444");
+            }
+        }
+        catch(Exception e){
+            Log.e("exception: ", e.getMessage());
+        }
+        finally {
+            c.close();
+            db.close();
+        }
+        return null;
+    }
 
     private JSONArray changeAcceDateToJson() {  //把一个集合转换成json格式的字符串
         AcceJsonArray=null;
@@ -527,7 +559,22 @@ public class UploadServiceM extends Service{
         Log.e("here!!!!!!!!", " magne");
         return MagneJsonArray;
     }
-
+    private JSONArray changeParkingDateToJson() {
+        ParkJsonArray=null;
+        ParkJsonArray = new JSONArray();
+        for (int i = 0; i < parkinglots.size(); i++) {
+            park_object = new JSONObject();
+            try {
+                park_object.put("UserID", parkinglots.get(i).getId());
+                park_object.put("Timestamp", parkinglots.get(i).getTimestamp());
+                park_object.put("State", parkinglots.get(i).getState());
+                ParkJsonArray.put(park_object);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return ParkJsonArray;
+    }
 
     private int post_data(String url, JSONArray json){
         int StatusCode = 0;
@@ -586,7 +633,7 @@ public class UploadServiceM extends Service{
     /*===WiFi State===*/
 //    NetworkInfo wifiCheck;
     private int[] wifistate = new int[1];
-    private int[] result = new int[8];
+    private int[] result = new int[9];
     private BroadcastReceiver mConnReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -608,6 +655,7 @@ public class UploadServiceM extends Service{
                         batteries = find_all_battery();
                         wifis = find_all_wifi();
                         magnetometers = find_all_magne();
+                        parkinglots = find_all_park();
 
                         if(gpses != null) {
                             latch = new CountDownLatch(6);
@@ -692,6 +740,24 @@ public class UploadServiceM extends Service{
                             Log.e("hehehe", "-------");
                             Log.e("result[5]","!!!!!"+result[5]);
                             Log.e("result[6]","!!!!!"+result[6]);
+                        }
+
+                        if(parkinglots != null){
+                            latch = new CountDownLatch(1);
+                            Thread t9 = new Thread() {
+                                public void run() {
+                                    result[8] = post_data(park_url, changeParkingDateToJson());
+                                    latch.countDown();
+                                }
+                            };
+                            t9.start();
+                            try {
+                                latch.await();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            Log.e("hehehe", "-------");
+                            Log.e("result[8]","!!!!!"+result[8]);
                         }
                         int sum = 0;
                         for(int i = 0; i < 5; i++)
@@ -785,7 +851,41 @@ public class UploadServiceM extends Service{
                         }
                         result[5] = 0;
                         result[6] = 0;
-                        if(gpses == null && batteries == null){
+
+                        if (result[8] == 200 ) {
+                            latch = new CountDownLatch(1);
+                            Thread t3 = new Thread() {
+                                public void run() {
+
+                                    db1 = dbHelper.getWritableDatabase();
+                                    try {
+                                        if (db1 != null) {
+
+                                            db1.execSQL("delete from parkingstate where timestamp between ? and ?", new Object[]{parkinglots.get(0).getTimestamp(), parkinglots.get(parkinglots.size() - 1).getTimestamp()});
+
+                                        } else {
+                                            Log.e("db1~~~~~~", "null");
+                                        }
+                                    }
+                                    catch(Exception e){
+                                        Log.e("here~~~~~~~~~~~~~~", "stop upload");
+                                        Log.e("exception: ", e.getMessage());
+                                    }
+                                    finally {
+                                        db1.close();
+                                    }
+                                    latch.countDown();
+                                }
+                            };
+                            t3.start();
+                            try {
+                                latch.await();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        result[8] = 0;
+                        if(gpses == null && batteries == null && parkinglots == null){
                             label = false;
                         }
                     }

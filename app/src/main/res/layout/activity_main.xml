@@ -124,6 +124,17 @@
         android:layout_marginTop="16dp"
         android:onClick="manualUpload" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/textview_border"
+        android:text="upload finished!"
+        android:textSize="30sp"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center"
+        android:onClick="breakServiceM"
+        android:id="@+id/Upload_State"/>
+
     <!--<Switch-->
         <!--android:id="@+id/ManuCheckUploadSwitch"-->
         <!--android:layout_width="wrap_content"-->
@@ -137,84 +148,89 @@
         <!--android:textOff="Off"-->
         <!--android:textOn="On"/>-->
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="stop data collection at 11:30pm, begin at 6:30am"
-        android:textSize="15sp"
-        android:textColor="@android:color/holo_red_light"
-        android:layout_marginTop="16dp"
-        android:layout_gravity="center"/>
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="stop data collection at 11:30pm, begin at 6:30am"-->
+        <!--android:textSize="15sp"-->
+        <!--android:textColor="@android:color/holo_red_light"-->
+        <!--android:layout_marginTop="16dp"-->
+        <!--android:layout_gravity="center"/>-->
 
-    <Switch
-        android:id="@+id/AutoControlSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:showText="true"
-        android:checked="false"
-        android:text="Auto Control Switch"
-        android:textOff="Off"
-        android:textOn="On"/>
+    <!--<Switch-->
+        <!--android:id="@+id/AutoControlSwitch"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textSize="20sp"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:layout_marginTop="16dp"-->
+        <!--android:showText="true"-->
+        <!--android:checked="false"-->
+        <!--android:text="Auto Control Switch"-->
+        <!--android:textOff="Off"-->
+        <!--android:textOn="On"/>-->
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mark bus stop"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:id="@+id/Mark_Bus_Stop"/>
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Before upload, please check WiFi connected"
-        android:textSize="15sp"
-        android:textColor="@android:color/holo_red_light"
-        android:layout_marginTop="16dp"
-        android:layout_gravity="center"/>
     <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Parking Lots"
-            android:onClick="parkingRecord"
-            android:id="@+id/Parking_Lots"/>
-        <Switch
-            android:id="@+id/ParkInfoUploadSwitch"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:showText="true"
-            android:checked="false"
-            android:text="Park Info Upload"
-            android:textOff="Off"
-            android:textOn="On"/>
+        android:id="@+id/Manual_Part"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Manual Input"
+        android:textSize="20sp"
+        android:textColor="@android:color/black"
+        android:layout_gravity="center"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+            <Button
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Mark bus stop"
+                android:id="@+id/Mark_Bus_Stop"/>
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Parking Lots"
+                android:onClick="parkingRecord"
+                android:id="@+id/Parking_Lots"/>
+            <!--<Switch-->
+                <!--android:id="@+id/ParkInfoUploadSwitch"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1"-->
+                <!--android:showText="true"-->
+                <!--android:checked="false"-->
+                <!--android:text="Park Info Upload"-->
+                <!--android:textOff="Off"-->
+                <!--android:textOn="On"/>-->
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/textview_border"
-        android:text="upload finished!"
-        android:textSize="30sp"
-        android:layout_marginTop="16dp"
-        android:layout_gravity="center"
-        android:onClick="breakServiceM"
-        android:id="@+id/Upload_State"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="parking info upload finished!"
-        android:textSize="20sp"
-        android:layout_marginTop="16dp"
-        android:layout_gravity="center"
-        android:id="@+id/PL_Upload_State"/>
+    <!--<TextView-->
+        <!--android:layout_weight="1"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_marginTop="16dp"-->
+        <!--android:text="( Before upload, please check WiFi connected )"-->
+        <!--android:textSize="15sp"-->
+        <!--android:textColor="@android:color/holo_red_light"-->
+        <!--android:layout_gravity="center"/>-->
 
+
+    <!--<TextView-->
+        <!--android:layout_weight="1"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:text="parking info upload finished!"-->
+        <!--android:textSize="20sp"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:id="@+id/PL_Upload_State"/>-->
+    </LinearLayout>
 </LinearLayout>
