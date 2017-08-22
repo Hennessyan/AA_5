@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
 
 
     private String sampling_rate;
+    private boolean sleepMode, manualInput;
     static TextView upload_state;
     static TextView upload_state_pl;
     private Button MarkBusStop;
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
     private SharedPreferences.Editor editor;
     private SharedPreferences prefs;
     public static Handler mHandler;
+    private boolean flagOfSharedPreferences = false;    //unregister
 
     //used to save parking lots info
     private GpsDbHelper dbHelper_pl;
@@ -86,23 +88,35 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
 
         DataCollectionSwitch = (Switch) findViewById(R.id.DataCollectionSwitch);
         AutoCheckUploadSwitch = (Switch) findViewById(R.id.AutoCheckUploadSwitch);
-        ManuCheckUploadSwitch = (Switch) findViewById(R.id.ManuCheckUploadSwitch);
+//        ManuCheckUploadSwitch = (Switch) findViewById(R.id.ManuCheckUploadSwitch);
         AutoControlSwitch = (Switch) findViewById(R.id.AutoControlSwitch);
         ParkInfoSwitch = (Switch) findViewById(R.id.ParkInfoUploadSwitch);
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        sampling_rate = sharedPreferences.getString(getResources().getString(R.string.sr_key_all),"1000");
-        Log.e("-----ALL SR-----",""+sampling_rate);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+//        sampling_rate = sharedPreferences.getString(getResources().getString(R.string.sr_key_all),"1000");
+//        sleepMode = sharedPreferences.getBoolean("checkboxPref_SM",false);
+//        manualInput = sharedPreferences.getBoolean("checkboxPref_MI",false);
+//        Log.e("-----ALL SR-----",""+sampling_rate);
+//        Log.e("-----SM SR1-----",""+sleepMode);
+//        Log.e("-----MI SR1-----",""+manualInput);
 
         /*used to keep the status recorded, otherwise everytime reopen the app, switch will be off*/
         editor = getSharedPreferences("com.llu17.youngq.sqlite_gps", MODE_PRIVATE).edit();
         prefs = getSharedPreferences("com.llu17.youngq.sqlite_gps", MODE_PRIVATE);
 
+        flagOfSharedPreferences = prefs.getBoolean("SharedPreferencesStatus",false);
+        if(!flagOfSharedPreferences) {
+            sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+            editor.putBoolean("SharedPreferencesStatus", true);
+            editor.commit();
+        }
+
+
+
         DataCollectionSwitch.setChecked(prefs.getBoolean("DCS_status",false));
         AutoCheckUploadSwitch.setChecked(prefs.getBoolean("ACU_status",false));
-        ManuCheckUploadSwitch.setChecked(prefs.getBoolean("MCU_status",false));
+//        ManuCheckUploadSwitch.setChecked(prefs.getBoolean("MCU_status",false));
         AutoControlSwitch.setChecked(prefs.getBoolean("ACS_status",false));
         ParkInfoSwitch.setChecked(prefs.getBoolean("PIS_status",false));
         //////////
@@ -183,19 +197,19 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
                 }
             }
         });
-        ManuCheckUploadSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
-                Log.e("ManuCheckUploadSwitch","i am here !");
-                editor.putBoolean("MCU_status", bChecked);
-                editor.commit();
-                if (bChecked) {
-                    uploadServiceM();
-                } else {
-                    breakServiceM();
-                }
-            }
-        });
+//        ManuCheckUploadSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
+//                Log.e("ManuCheckUploadSwitch","i am here !");
+//                editor.putBoolean("MCU_status", bChecked);
+//                editor.commit();
+//                if (bChecked) {
+//                    uploadServiceM();
+//                } else {
+//                    breakServiceM();
+//                }
+//            }
+//        });
         AutoControlSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
@@ -273,7 +287,15 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.sr_key_all))) {
             sampling_rate = sharedPreferences.getString(key, "1000");
-            Log.e("-----ALL SR-----","changed: "+sampling_rate);
+            Log.e("-----ALL SR2-----","changed: "+sampling_rate);
+        } else if (key.equals("checkboxPref_SM")){
+            sleepMode = sharedPreferences.getBoolean(key, false);
+            Log.e("-----SM SR2-----",""+sleepMode);
+//            Log.e("-----~~~~~~-----","~~~~~~~");
+        } else if (key.equals("checkboxPref_MI")){
+            manualInput = sharedPreferences.getBoolean(key, false);
+            Log.e("-----MI SR2-----",""+manualInput);
+//            Log.e("********","~~~~~~~");
         }
     }
     public void startService() {        //startService(View view) 如果使用button.click去控制就要使用:startService(View v)
@@ -310,7 +332,7 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
         startService(new Intent(getBaseContext(), UploadServiceM.class));
     }
 
-    public void breakServiceM(){       //breakServiceM(View view)
+    public void breakServiceM(View view){       //breakServiceM(View view)
         Toast.makeText(this, "Stop to upload data manually", Toast.LENGTH_SHORT).show();
         stopService(new Intent(getBaseContext(), UploadServiceM.class));
     }
@@ -368,6 +390,25 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
                 Toast.makeText(MainActivity.this, "Do nothing!", Toast.LENGTH_SHORT).show();
             }
         });
+        dialog.show();
+    }
+
+    public void manualUpload(View view){
+        AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+        dialog.setTitle("Manual Upload");
+        dialog.setMessage("Would you like to upload data to Server? (make sure WiFi connected)");
+        dialog.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                uploadServiceM();
+            }
+        })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Toast.makeText(MainActivity.this, "Do nothing!", Toast.LENGTH_SHORT).show();
+                    }
+                });
         dialog.show();
 
     }

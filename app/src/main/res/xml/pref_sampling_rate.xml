@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <ListPreference
-        android:key="@string/sr_key_all"
-        android:title="All Sampling Rate"
-        android:defaultValue="1000"
-        android:entries="@array/sampling_rate_names_array"
-        android:entryValues="@array/sampling_rate_values_array"
-        android:summary="Select the sampling rate"
-        android:enabled="true"
-        android:shouldDisableView="false"
-        android:icon="@drawable/blue"
-        android:dialogIcon="@drawable/purple"
-        />
-
+    <PreferenceCategory>
+        <ListPreference
+            android:key="@string/sr_key_all"
+            android:title="All Sampling Rate"
+            android:defaultValue="1000"
+            android:entries="@array/sampling_rate_names_array"
+            android:entryValues="@array/sampling_rate_values_array"
+            android:summary="Select the sampling rate"
+            android:enabled="true"
+            android:shouldDisableView="false"
+            android:icon="@drawable/blue"
+            android:dialogIcon="@drawable/purple"
+            />
+    </PreferenceCategory>
+    <PreferenceCategory>
+        <CheckBoxPreference
+            android:title="Sleep Model"
+            android:defaultValue="false"
+            android:summary="stop data collection at 11:30pm, begin at 6:30am"
+            android:key="checkboxPref_SM"/>
+    </PreferenceCategory>
+    <PreferenceCategory>
+        <CheckBoxPreference
+            android:title="Manual Input Part"
+            android:defaultValue="false"
+            android:summary="Manual mark bus stop and parking lots status"
+            android:key="checkboxPref_MI"/>
+    </PreferenceCategory>
 </PreferenceScreen>
