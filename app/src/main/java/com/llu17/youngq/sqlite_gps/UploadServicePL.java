@@ -49,7 +49,7 @@ public class UploadServicePL extends Service {
     private SQLiteDatabase db,db1;
 
 
-    private String park_url = "http://cs.binghamton.edu/~smartpark/lulu_test/parkingstate.php";
+    private String park_url = "http://cs.binghamton.edu/~smartpark/lulu_test2/parkingstate.php";
     private ArrayList<PARKINGSTATE> parkinglots;
 
     private JSONObject park_object;

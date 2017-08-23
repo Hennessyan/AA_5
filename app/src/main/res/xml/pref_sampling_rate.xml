@@ -18,7 +18,7 @@
         <CheckBoxPreference
             android:title="Sleep Model"
             android:defaultValue="false"
-            android:summary="stop data collection at 11:30pm, begin at 6:30am"
+            android:summary="stop data collection at 01:00 am, begin at 06:00am"
             android:key="checkboxPref_SM"/>
     </PreferenceCategory>
     <PreferenceCategory>

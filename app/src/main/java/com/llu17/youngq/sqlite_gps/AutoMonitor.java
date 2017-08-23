@@ -37,11 +37,13 @@ public class AutoMonitor extends TimerTask {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         try {
             cur = sdf.parse(str);
-            daystart = sdf.parse("18:00:00");
-            dayend = sdf.parse("23:00:00");
+//            daystart = sdf.parse("01:00:00");
+//            dayend = sdf.parse("06:00:00");
+            daystart = sdf.parse("13:30:00");
+            dayend = sdf.parse("13:35:00");
 
-            daystart1 = sdf.parse("05:00:00");
-            dayend1 = sdf.parse("09:00:00");
+            daystart1 = sdf.parse("13:40:00");
+            dayend1 = sdf.parse("13:45:00");
         } catch (ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

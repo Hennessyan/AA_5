@@ -237,6 +237,11 @@ public class CollectorService extends Service implements SensorEventListener {
         timer1.cancel();
         sensorManager.unregisterListener(this);
         Log.e("===Sensor===","===stop===");
+        try {       //make sure Upload class finish using mDb
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         mDb.close();
     }
 

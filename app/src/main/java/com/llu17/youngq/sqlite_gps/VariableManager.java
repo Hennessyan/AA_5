@@ -75,15 +75,15 @@ public class VariableManager {
     private boolean[] myBoolean = new boolean[9];
     public void doYourWork() {
         Log.e("There is WiFi","I am here!");
-        final String gps_url = "http://cs.binghamton.edu/~smartpark/lulu_test/gps.php";
-        final String acce_url = "http://cs.binghamton.edu/~smartpark/lulu_test/accelerometer.php";
-        final String gyro_url = "http://cs.binghamton.edu/~smartpark/lulu_test/gyroscope.php";
-        final String step_url = "http://cs.binghamton.edu/~smartpark/lulu_test/step.php";
-        final String motion_url = "http://cs.binghamton.edu/~smartpark/lulu_test/motionstate.php";
-        final String wifi_url = "http://cs.binghamton.edu/~smartpark/lulu_test/wifi.php";
-        final String battery_url = "http://cs.binghamton.edu/~smartpark/lulu_test/battery.php";
-        final String magne_url = "http://cs.binghamton.edu/~smartpark/lulu_test/magnetometer.php";
-        final String park_url = "http://cs.binghamton.edu/~smartpark/lulu_test/parkingstate.php";
+        final String gps_url = "http://cs.binghamton.edu/~smartpark/lulu_test2/gps.php";
+        final String acce_url = "http://cs.binghamton.edu/~smartpark/lulu_test2/accelerometer.php";
+        final String gyro_url = "http://cs.binghamton.edu/~smartpark/lulu_test2/gyroscope.php";
+        final String step_url = "http://cs.binghamton.edu/~smartpark/lulu_test2/step.php";
+        final String motion_url = "http://cs.binghamton.edu/~smartpark/lulu_test2/motionstate.php";
+        final String wifi_url = "http://cs.binghamton.edu/~smartpark/lulu_test2/wifi.php";
+        final String battery_url = "http://cs.binghamton.edu/~smartpark/lulu_test2/battery.php";
+        final String magne_url = "http://cs.binghamton.edu/~smartpark/lulu_test2/magnetometer.php";
+        final String park_url = "http://cs.binghamton.edu/~smartpark/lulu_test2/parkingstate.php";
         final int[] result = new int[9];
 
         boolean label = true;

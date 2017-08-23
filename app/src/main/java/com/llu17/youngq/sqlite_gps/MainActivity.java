@@ -241,8 +241,9 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
         mHandler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message message) {
-                Log.e("I am in handler","lalala");
+//                Log.e("I am in handler","lalala");
                 if(message.arg1 == 1){
+                    Log.e("stop server","1111");
                     stopService();
                     breakService();
                     editor.putBoolean("DCS_status", false);
@@ -251,6 +252,7 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
                     editor.commit();
                 }
                 else if(message.arg1 == 2){
+                    Log.e("start server","2222");
                     startService();
                     uploadService();
                     editor.putBoolean("DCS_status", true);
@@ -354,11 +356,11 @@ public class MainActivity extends AppCompatActivity  implements SharedPreference
     }
 
     public void startAutoControl(){
-        Toast.makeText(this, "Begin auto work at 6:30 am and stop at 11:30 pm", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Begin sleep mode", Toast.LENGTH_SHORT).show();
         startService(new Intent(getBaseContext(), AutoControl.class));
     }
     public void breakAutoControl(){
-        Toast.makeText(this, "Stop auto work at 6:30 am and stop at 11:30 pm", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Stop sleep mode", Toast.LENGTH_SHORT).show();
         stopService(new Intent(getBaseContext(), AutoControl.class));
     }
 
